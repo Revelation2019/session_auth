@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+</head>
+<body>
+  <div id="app">home</div>
+  <button onclick="logout()">退出</button>
+</body>
+</html>
+<script>
+  $.ajax({
+    url: "http://127.0.0.1:1001/getData",
+    method: 'GET',
+    dataType: 'json',
+    xhrFields: {
+      withCredentials: true //允许携带Cookie
+    },
+    success: function(res) {
+      console.log(res)
+      if (res.code === 401) {
+        window.location.href = "http://127.0.0.1:2000/?redirect_url=" + encodeURIComponent(window.location.href)
+      } else if (res.code === 200) {
+        $("#app").text(res.data.msg)
+      }
+    }
+  })
+
+  function logout() {
+    $.ajax({
+      url: "http://127.0.0.1:1001/logout",
+      method: 'GET',
+      dataType: 'json',
+      xhrFields: {
+        withCredentials: true //允许携带Cookie
+      },
+      success: function(res) {
+        if (res.code === 200) {
+          // 不能再这里操作document.cookie来删除sessionId，因为设置了httpOnly
+          window.location.reload()
+        }
+      }
+    })
+  }
+</script>
